@@ -15,13 +15,10 @@ const saltRounds = 10;
 const sanitizeHtml = require('sanitize-html');
 
 
-const corsOptions = {
-  origin: 'http://localhost:5173',
-  credentials: true,
-  optionsSuccessStatus: 200
-};
-
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: 'https://react-express-login-system-lake.vercel.app',
+  credentials: true
+}));
 
 app.use(bodyParser.json());
 

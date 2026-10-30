@@ -8,7 +8,7 @@ function AuthProvider({ children }) {
 
     async function register(name, email, password, confirmPassword) {
         try {
-            const response = await axios.post('http://localhost:3001/register', { name, email, password, confirmPassword }, { withCredentials: true });
+            const response = await axios.post('https://react-express-login-system-dpxv.onrender.com/register', { name, email, password, confirmPassword }, { withCredentials: true });
 
             if (response.data.success) {
                 setUser(response.data.user); 
@@ -27,7 +27,7 @@ function AuthProvider({ children }) {
 
     async function login(email, password) {
         try {
-            const response = await axios.post('http://localhost:3001/login', { email, password }, { withCredentials: true });
+            const response = await axios.post('https://react-express-login-system-dpxv.onrender.com/login', { email, password }, { withCredentials: true });
 
             if (response.data.success) {
                 setUser(response.data.user); 
@@ -47,7 +47,7 @@ function AuthProvider({ children }) {
 
     async function logout() {
         setUser(null);
-        const response = await axios.post('http://localhost:3001/logout', {}, { withCredentials: true });
+        const response = await axios.post('https://react-express-login-system-dpxv.onrender.com/logout', {}, { withCredentials: true });
 
         if (response.data.success) {
             alert('User logged out');

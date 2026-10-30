@@ -15,7 +15,7 @@ function App() {
     hasFetched = true;
 
     try {
-      const response = await axios.get('http://localhost:3001/profile', { withCredentials: true });
+      const response = await axios.get('https://react-express-login-system-dpxv.onrender.com/profile', { withCredentials: true });
 
       if (response.data && response.data.email) {
         setUser(response.data);
