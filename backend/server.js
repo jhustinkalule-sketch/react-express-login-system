@@ -1,6 +1,16 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
+const dotenv = require('dotenv');
+const session = require('express-session');
+const { MongoClient } = require('mongodb');
+const bcrypt = require('bcrypt');
+const sanitizeHtml = require('sanitize-html');
+
+dotenv.config();
+
 const app = express();
+app.set('trust proxy', 1);
 
 app.use(cors({
   origin: ['https://react-express-login-system-lake.vercel.app', 'http://localhost:5173'],
@@ -8,25 +18,22 @@ app.use(cors({
 }));
 
 app.use(express.json());
-
-const path = require('path');
-const dotenv = require('dotenv');
-const result = dotenv.config({ path: path.join(__dirname, '.env') });
-
-const port = process.env.PORT || 5000;
-const session = require('express-session');
-const { MongoClient } = require('mongodb');
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
-const sanitizeHtml = require('sanitize-html');
-
 app.use(express.urlencoded({ extended: false }));
 
 app.use(session({
-  secret: 'something',
+  secret: process.env.SESSION_SECRET || 'something',
   resave: false,
   saveUninitialized: false,
+  cookie: {
+    secure: true,
+    sameSite: 'none'
+  }
 }));
+
+const uri = process.env.MONGO_URI || process.env.DATABASE_URL || 'mongodb://127.0.0.1:27017/login-system';
+let client;
+let db;
+const saltRounds = 10;
 
 app.use(express.static(path.join(__dirname, '/dist')));
 
@@ -34,20 +41,19 @@ app.post('/api/login', (req, res) => {
   res.status(200).json({ message: "Backend is working!" });
 });
 
-const uri = process.env.MONGO_URI || process.env.DATABASE_URL || 'mongodb://127.0.0.1:27017/login-system';
-let client;
-
-async function connectDB() {
+async function startServer() {
   try {
     client = new MongoClient(uri);
     await client.connect();
+    db = client.db('login-system');
     console.log('Connected to MongoDB Atlas');
+
+    const port = process.env.PORT || 5000;
+    app.listen(port, () => console.log(`Server running on port ${port}`));
   } catch (error) {
     console.error('Failed to connect to MongoDB Atlas', error);
   }
 }
-
-connectDB();
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
@@ -76,8 +82,7 @@ app.post('/login', async (req, res) => {
   password = sanitizeInput(password);
 
   try {
-    const database = client.db('login-system');
-    const usersCollection = database.collection('users');
+    const usersCollection = db.collection('users');
 
     const user = await usersCollection.findOne({ email: email });
 
@@ -114,8 +119,7 @@ app.post('/register', async (req, res) => {
   if (password !== confirmPassword) {
     return res.status(400).send({ success: false, message: 'Passwords do not match.' }); 
   } 
-    const database = client.db('login-system');
-    const usersCollection = database.collection('users');
+    const usersCollection = db.collection('users');
     const userExists = await usersCollection.findOne({ email: email });
 
       if (userExists) {
@@ -157,6 +161,4 @@ app.post('/logout', (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-});
+startServer();
