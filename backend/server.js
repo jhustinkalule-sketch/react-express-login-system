@@ -1,26 +1,24 @@
+const express = require('express');
+const cors = require('cors');
+const app = express();
+
+app.use(cors({
+  origin: ['https://react-express-login-system-lake.vercel.app', 'http://localhost:5173'],
+  credentials: true
+}));
+
+app.use(express.json());
+
 const path = require('path');
 const dotenv = require('dotenv');
-
 const result = dotenv.config({ path: path.join(__dirname, '.env') });
 
-const express = require('express');
-const app = express();
-const port = process.env.PORT || 3001;
-const cors = require('cors');
-const bodyParser = require('body-parser');
+const port = process.env.PORT || 5000;
 const session = require('express-session');
 const { MongoClient } = require('mongodb');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const sanitizeHtml = require('sanitize-html');
-
-
-app.use(cors({
-  origin: 'https://react-express-login-system-lake.vercel.app',
-  credentials: true
-}));
-
-app.use(bodyParser.json());
 
 app.use(express.urlencoded({ extended: false }));
 
