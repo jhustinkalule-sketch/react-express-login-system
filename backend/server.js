@@ -35,6 +35,10 @@ app.use(session({
 
 app.use(express.static(path.join(__dirname, '/dist')));
 
+app.post('/api/login', (req, res) => {
+  res.status(200).json({ message: "Backend is working!" });
+});
+
 const uri = process.env.MONGO_URI;
 let client;
 
