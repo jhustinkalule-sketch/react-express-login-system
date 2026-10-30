@@ -36,7 +36,7 @@ app.post('/api/login', (req, res) => {
   res.status(200).json({ message: "Backend is working!" });
 });
 
-const uri = process.env.MONGO_URI;
+const uri = process.env.MONGO_URI || process.env.DATABASE_URL || 'mongodb://127.0.0.1:27017/login-system';
 let client;
 
 async function connectDB() {
